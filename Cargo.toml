@@ -1,0 +1,6 @@
+[package]
+name = "vom"
+version = "0.1.0"
+authors = ["Benjamin Prosnitz <bprosnitz@google.com>"]
+
+[dependencies]
