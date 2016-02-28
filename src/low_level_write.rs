@@ -29,7 +29,7 @@ pub fn write_uint<W: io::Write>(writer: &mut W, uval: u64) -> Result<usize, io::
     } else if uval <= 0xffffffffffffff {
         writer.write(&[0xff as u8, (uval >> 48) as u8, (uval >> 40) as u8, (uval >> 32) as u8, (uval >> 24) as u8, (uval >> 16) as u8, (uval >> 8) as u8, uval as u8])
     } else {
-        writer.write(&[0xff as u8, (uval >> 48) as u8, (uval >> 40) as u8, (uval >> 32) as u8, (uval >> 24) as u8, (uval >> 16) as u8, (uval >> 8) as u8, uval as u8])
+        writer.write(&[0xff as u8, (uval >> 56) as u8, (uval >> 48) as u8, (uval >> 40) as u8, (uval >> 32) as u8, (uval >> 24) as u8, (uval >> 16) as u8, (uval >> 8) as u8, uval as u8])
     }
 }
 /*
@@ -69,42 +69,35 @@ mod tests {
     use std::vec::Vec;
     use super::{write_uint};
 
-    #[test]
-    fn test_write_uint() {
+    fn write_uint_test_helper(input: u64, output: &[u8])    {
         let buf = Vec::new();
         let mut writer = io::BufWriter::with_capacity(0, buf);
-        write_uint(&mut writer, 128).unwrap();
-        assert_eq!(*writer.get_ref(), [255, 128]);
 
-        //write_uint(writer, 128).expect(2);
-        /*let mut writer = io::BufWriter::with_capacity(2, inner);
+        write_uint(&mut writer, input).unwrap();
+        assert_eq!(*writer.get_ref(), output);
+    }
 
-        writer.write(&[0, 1]).unwrap();
-        assert_eq!(*writer.get_ref(), [0, 1]);
-
-        writer.write(&[2]).unwrap();
-        assert_eq!(*writer.get_ref(), [0, 1]);
-
-        writer.write(&[3]).unwrap();
-        assert_eq!(*writer.get_ref(), [0, 1]);
-
-        writer.flush().unwrap();
-        assert_eq!(*writer.get_ref(), [0, 1, 2, 3]);
-
-        writer.write(&[4]).unwrap();
-        writer.write(&[5]).unwrap();
-        assert_eq!(*writer.get_ref(), [0, 1, 2, 3]);
-
-        writer.write(&[6]).unwrap();
-        assert_eq!(*writer.get_ref(), [0, 1, 2, 3, 4, 5]);
-
-        writer.write(&[7, 8]).unwrap();
-        assert_eq!(*writer.get_ref(), [0, 1, 2, 3, 4, 5, 6, 7, 8]);
-
-        writer.write(&[9, 10, 11]).unwrap();
-        assert_eq!(*writer.get_ref(), [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11]);
-
-        writer.flush().unwrap();
-        assert_eq!(*writer.get_ref(), [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11]);*/
+    #[test]
+    fn test_write_uint() {
+        write_uint_test_helper(0x00, &[0x00]);
+        write_uint_test_helper(0x42, &[0x42]);
+        write_uint_test_helper(0x7f, &[0x7f]);
+        write_uint_test_helper(0x80, &[0xff, 0x80]);
+        write_uint_test_helper(0xff, &[0xff, 0xff]);
+        write_uint_test_helper(0x0100, &[0xff, 0x01, 0x00]);
+        write_uint_test_helper(0xffff, &[0xff, 0xff, 0xff]);
+        write_uint_test_helper(0x010000, &[0xff, 0x01, 0x00, 0x00]);
+        write_uint_test_helper(0xffffff, &[0xff, 0xff, 0xff, 0xff]);
+        write_uint_test_helper(0x01000000, &[0xff, 0x01, 0x00, 0x00, 0x00]);
+        write_uint_test_helper(0xdeadbeef, &[0xff, 0xde, 0xad, 0xbe, 0xef]);
+        write_uint_test_helper(0xffffffff, &[0xff, 0xff, 0xff, 0xff, 0xff]);
+        write_uint_test_helper(0x0100000000, &[0xff, 0x01, 0x00, 0x00, 0x00, 0x00]);
+        write_uint_test_helper(0xffffffffff, &[0xff, 0xff, 0xff, 0xff, 0xff, 0xff]);
+        write_uint_test_helper(0x010000000000, &[0xff, 0x01, 0x00, 0x00, 0x00, 0x00, 0x00]);
+        write_uint_test_helper(0xffffffffffff, &[0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff]);
+        write_uint_test_helper(0x01000000000000, &[0xff, 0x01, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00]);
+        write_uint_test_helper(0xffffffffffffff, &[0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff]);
+        write_uint_test_helper(0x0100000000000000, &[0xff, 0x01, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00]);
+        write_uint_test_helper(0xffffffffffffffff, &[0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff]);
     }
 }
