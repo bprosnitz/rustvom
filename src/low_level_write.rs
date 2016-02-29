@@ -35,9 +35,9 @@ fn write_float<W: io::Write>(writer: &mut W, fval: f64) -> Result<usize, io::Err
 
 fn write_bool<W: io::Write>(writer: &mut W, bval: bool) -> Result<usize, io::Error> {
     if bval {
-        writer.write_uint(1)
+        write_uint(writer, 1)
     } else {
-        writer.write_uint(0)
+        write_uint(writer, 0)
     }
 }
 
@@ -66,7 +66,7 @@ mod tests {
     use std::io::prelude::*;
     use std::io;
     use std::vec::Vec;
-    use super::{write_uint,write_int,write_float};
+    use super::{write_uint,write_int,write_float,write_bool};
 
     fn write_uint_test_helper(input: u64, output: &[u8])    {
         let buf = Vec::new();
@@ -164,6 +164,6 @@ mod tests {
     #[test]
     fn test_write_bool() {
         write_bool_test_helper(false, &[0x00]);
-        write_bool_test_helper(true, &[0x00]);
+        write_bool_test_helper(true, &[0x01]);
     }
 }
