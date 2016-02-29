@@ -25,12 +25,14 @@ pub fn write_uint<W: io::Write>(writer: &mut W, uval: u64) -> Result<usize, io::
 fn write_int<W: io::Write>(writer: &mut W, ival: i64) -> Result<usize, io::Error> {
     write_uint(writer, int_to_uint(ival))
 }
-/*
-fn write_float<W: io::Write>(mut writer: W, fval: f64) -> Result<usize, io::Error> {
-    let uvalptr = (&fval as *const u64);
-    let uval = unsafe{*uvalptr};
+
+fn write_float<W: io::Write>(writer: &mut W, fval: f64) -> Result<usize, io::Error> {
+    let f64ptr: *const f64 = &fval;
+    let u64ptr: *const u64 = f64ptr as *const _;
+    let uval = unsafe { *u64ptr };
+    write_uint(writer, reverse_byte_order(uval))
 }
-*/
+
 fn reverse_byte_order(v: u64) -> u64 {
     (v&0xff)<<56 |
 	(v&0xff00)<<40 |
@@ -56,7 +58,7 @@ mod tests {
     use std::io::prelude::*;
     use std::io;
     use std::vec::Vec;
-    use super::{write_uint,write_int};
+    use super::{write_uint,write_int,write_float};
 
     fn write_uint_test_helper(input: u64, output: &[u8])    {
         let buf = Vec::new();
@@ -125,5 +127,21 @@ mod tests {
         write_int_test_helper(-(1<<15), &[0xfe, 0xff, 0xff]);
         write_int_test_helper(-0x80000000, &[0xfc, 0xff, 0xff, 0xff, 0xff]);
         write_int_test_helper(-0x8000000000000000, &[0xf8, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff]);
+    }
+
+    fn write_float_test_helper(input: f64, output: &[u8])    {
+        let buf = Vec::new();
+        let mut writer = io::BufWriter::with_capacity(0, buf);
+
+        write_float(&mut writer, input).unwrap();
+        assert_eq!(*writer.get_ref(), output);
+    }
+
+    #[test]
+    fn test_write_float() {
+        write_float_test_helper(0.0, &[0x00]);
+        write_float_test_helper(1.0, &[0xfe, 0xf0, 0x3f]);
+        write_float_test_helper(17.0, &[0xfe, 0x31, 0x40]);
+        write_float_test_helper(18.0, &[0xfe, 0x32, 0x40]);
     }
 }
