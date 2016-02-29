@@ -33,6 +33,14 @@ fn write_float<W: io::Write>(writer: &mut W, fval: f64) -> Result<usize, io::Err
     write_uint(writer, reverse_byte_order(uval))
 }
 
+fn write_bool<W: io::Write>(writer: &mut W, bval: bool) -> Result<usize, io::Error> {
+    if bval {
+        writer.write_uint(1)
+    } else {
+        writer.write_uint(0)
+    }
+}
+
 fn reverse_byte_order(v: u64) -> u64 {
     (v&0xff)<<56 |
 	(v&0xff00)<<40 |
@@ -143,5 +151,19 @@ mod tests {
         write_float_test_helper(1.0, &[0xfe, 0xf0, 0x3f]);
         write_float_test_helper(17.0, &[0xfe, 0x31, 0x40]);
         write_float_test_helper(18.0, &[0xfe, 0x32, 0x40]);
+    }
+
+    fn write_bool_test_helper(input: bool, output: &[u8])    {
+        let buf = Vec::new();
+        let mut writer = io::BufWriter::with_capacity(0, buf);
+
+        write_bool(&mut writer, input).unwrap();
+        assert_eq!(*writer.get_ref(), output);
+    }
+
+    #[test]
+    fn test_write_bool() {
+        write_bool_test_helper(false, &[0x00]);
+        write_bool_test_helper(true, &[0x00]);
     }
 }
