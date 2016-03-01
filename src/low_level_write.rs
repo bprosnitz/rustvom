@@ -41,15 +41,19 @@ fn write_bool<W: io::Write>(writer: &mut W, bval: bool) -> Result<usize, io::Err
     }
 }
 
-fn write_string<W: io::Write>(writer: &mut W, sval: &str) -> Option<io::Error> {
-    match write_uint(writer, sval.len() as u64) {
+fn write_byte_slice<W: io::Write>(writer: &mut W, bval: &[u8]) -> Option<io::Error> {
+    match write_uint(writer, bval.len() as u64) {
         Ok(n) => {},
         Err(err) => return Some(err)
     };
-    match writer.write(sval.as_bytes()) {
+    match writer.write(bval) {
         Ok(n) => None,
         Err(err) => Some(err)
     }
+}
+
+fn write_string<W: io::Write>(writer: &mut W, sval: &str) -> Option<io::Error> {
+    write_byte_slice(writer, sval.as_bytes())
 }
 
 fn reverse_byte_order(v: u64) -> u64 {
@@ -77,7 +81,7 @@ mod tests {
     use std::io::prelude::*;
     use std::io;
     use std::vec::Vec;
-    use super::{write_uint,write_int,write_float,write_bool,write_string};
+    use super::{write_uint,write_int,write_float,write_bool,write_string,write_byte_slice};
 
     fn write_uint_test_helper(input: u64, output: &[u8])    {
         let buf = Vec::new();
@@ -178,6 +182,20 @@ mod tests {
         write_bool_test_helper(true, &[0x01]);
     }
 
+    fn write_byte_slice_test_helper(input: &[u8], output: &[u8])    {
+        let buf = Vec::new();
+        let mut writer = io::BufWriter::with_capacity(0, buf);
+
+        assert_eq!(write_byte_slice(&mut writer, input).is_none(), true);
+        assert_eq!(*writer.get_ref(), output);
+    }
+
+    #[test]
+    fn test_write_byte_slice() {
+        write_byte_slice_test_helper(&[] as &[u8], &[0]);
+        write_byte_slice_test_helper(&[97 as u8, 98, 99], &[3, 97, 98, 99]);
+    }
+
     fn write_string_test_helper(input: &str, output: &[u8])    {
         let buf = Vec::new();
         let mut writer = io::BufWriter::with_capacity(0, buf);
@@ -188,7 +206,7 @@ mod tests {
 
     #[test]
     fn test_write_string() {
-        write_string_test_helper("", &[0x00]);
+        write_string_test_helper("", &[0]);
         write_string_test_helper("abc", &[3, 97, 98, 99]);
     }
 }
