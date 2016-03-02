@@ -22,18 +22,18 @@ pub fn write_uint<W: io::Write>(writer: &mut W, uval: u64) -> Result<usize, io::
     }
 }
 
-fn write_int<W: io::Write>(writer: &mut W, ival: i64) -> Result<usize, io::Error> {
+pub fn write_int<W: io::Write>(writer: &mut W, ival: i64) -> Result<usize, io::Error> {
     write_uint(writer, int_to_uint(ival))
 }
 
-fn write_float<W: io::Write>(writer: &mut W, fval: f64) -> Result<usize, io::Error> {
+pub fn write_float<W: io::Write>(writer: &mut W, fval: f64) -> Result<usize, io::Error> {
     let f64ptr: *const f64 = &fval;
     let u64ptr: *const u64 = f64ptr as *const _;
     let uval = unsafe { *u64ptr };
     write_uint(writer, reverse_byte_order(uval))
 }
 
-fn write_bool<W: io::Write>(writer: &mut W, bval: bool) -> Result<usize, io::Error> {
+pub fn write_bool<W: io::Write>(writer: &mut W, bval: bool) -> Result<usize, io::Error> {
     if bval {
         write_uint(writer, 1)
     } else {
@@ -41,7 +41,7 @@ fn write_bool<W: io::Write>(writer: &mut W, bval: bool) -> Result<usize, io::Err
     }
 }
 
-fn write_byte_slice<W: io::Write>(writer: &mut W, bval: &[u8]) -> Option<io::Error> {
+pub fn write_byte_slice<W: io::Write>(writer: &mut W, bval: &[u8]) -> Option<io::Error> {
     match write_uint(writer, bval.len() as u64) {
         Ok(n) => {},
         Err(err) => return Some(err)
@@ -52,7 +52,7 @@ fn write_byte_slice<W: io::Write>(writer: &mut W, bval: &[u8]) -> Option<io::Err
     }
 }
 
-fn write_string<W: io::Write>(writer: &mut W, sval: &str) -> Option<io::Error> {
+pub fn write_string<W: io::Write>(writer: &mut W, sval: &str) -> Option<io::Error> {
     write_byte_slice(writer, sval.as_bytes())
 }
 
