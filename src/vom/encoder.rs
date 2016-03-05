@@ -13,4 +13,11 @@ impl vdl::Target for encoder {
             Err(err) => Some(err),
         }
     }
+
+    fn from_uint(&self, src: bool, tt: *mut vdl::Type) -> Option<io::Error> {
+        match low_level_write::write_uint(self.writer, src) {
+            Ok(n) => None,
+            Err(err) => Some(err),
+        }
+    }
 }
