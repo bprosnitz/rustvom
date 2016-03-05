@@ -1,6 +1,6 @@
 use std::io;
 use vdl;
-use low_level_write;
+use super::low_level_write;
 
 struct encoder {
     writer: io::Write,
