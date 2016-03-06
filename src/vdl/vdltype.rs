@@ -1,5 +1,7 @@
 use std::vec;
 use std::string;
+use std::boxed;
+use std::collections;
 
 pub enum Kind {
     // Variant kinds
@@ -36,12 +38,18 @@ pub struct Type {
     name: string::String,
 	labels:       vec::Vec<string::String>,    // used by Enum
 	len:          usize,         // used by Array
-	elem:         *mut Type,       // used by Optional, Array, List, Map
-	key:          *mut Type,       // used by Set, Map
+	elem:         usize,       // used by Optional, Array, List, Map
+	key:          usize,       // used by Set, Map
 	fields:       vec::Vec<Field>,     // used by Struct, Union
 }
 
 pub struct Field {
     name: string::String,
-    t: *mut Type,
+    t: usize,
+}
+
+static mut typecons : collections::HashMap<usize, Box<Type>> = collections::HashMap::new();
+
+pub fn AddType(typeId: usize, tt: Box<Type>) {
+    typecons.insert(typeId, tt)
 }
