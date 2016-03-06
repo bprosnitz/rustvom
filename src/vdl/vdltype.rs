@@ -38,18 +38,12 @@ pub struct Type {
     name: string::String,
 	labels:       vec::Vec<string::String>,    // used by Enum
 	len:          usize,         // used by Array
-	elem:         usize,       // used by Optional, Array, List, Map
-	key:          usize,       // used by Set, Map
+	elem:         *mut Type,       // used by Optional, Array, List, Map
+	key:          *mut Type,       // used by Set, Map
 	fields:       vec::Vec<Field>,     // used by Struct, Union
 }
 
 pub struct Field {
     name: string::String,
-    t: usize,
-}
-
-static mut typecons : collections::HashMap<usize, Box<Type>> = collections::HashMap::new();
-
-pub fn AddType(typeId: usize, tt: Box<Type>) {
-    typecons.insert(typeId, tt)
+    t: *mut Type,
 }
