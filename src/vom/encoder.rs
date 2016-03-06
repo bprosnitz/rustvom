@@ -6,6 +6,10 @@ struct encoder {
     writer: io::Write,
 }
 
+impl encoder {
+    fn write_control_byte(&self, src: u8)
+}
+
 impl vdl::Target for encoder {
     fn from_bool(&self, src: bool, tt: *mut vdl::Type) -> Option<vdl::TargetError> {
         match low_level_write::write_bool(self.writer, src) {
