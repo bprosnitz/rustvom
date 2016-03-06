@@ -63,19 +63,45 @@ impl vdl::Target for encoder {
 
 impl vdl::ListTarget for encoder {
     fn start_elem(&self, index: usize) -> Result<vdl::Target, io::Error> {
+        Ok(&self)
 
     }
 
     fn finish_elem(&self, elem: vdl::Target) -> Option<io::Error> {
-
+        None
     }
 }
 
 impl vdl::SetTarget for encoder {
+    fn start_key(&self) -> Result<vdl::Target, io::Error> {
+        Ok(&self)
+    }
+
+    fn finish_key(&self, key: vdl::Target) ->Option<io::Error> {
+        None
+    }
 }
 
 impl vdl::MapTarget for encoder {
+    fn start_key(&self) -> Result<vdl::Target, io::Error> {
+        Ok(&self)
+    }
+
+    fn finish_key_start_field(&self, key: vdl::Target) -> Result<vdl::Target, io::Error> {
+        Ok(&self)
+    }
+
+    fn finish_field(&self, key: vdl::Target, field: vdl::Target) -> Option<io::Error> {
+        None
+    }
 }
 
 impl vdl::FieldsTarget for encoder {
+    fn start_field(&self, name: &str) -> Result<(vdl::Target, vdl::Target), io::Error> {
+
+    }
+
+    fn finish_field(&self, key: vdl::Target, field: vdl::Target) -> Option<io::Error> {
+
+    }
 }

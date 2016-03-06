@@ -1,3 +1,6 @@
+use std::vec;
+use std::string;
+
 pub enum Kind {
     // Variant kinds
 	Any,      // any type
@@ -30,15 +33,15 @@ pub enum Kind {
 
 pub struct Type {
     kind: Kind,
-    name: *const str,
-	labels:       * const[*const str],    // used by Enum
+    name: string::String,
+	labels:       vec::Vec<string::String>,    // used by Enum
 	len:          usize,         // used by Array
 	elem:         *mut Type,       // used by Optional, Array, List, Map
 	key:          *mut Type,       // used by Set, Map
-	fields:       *const [Field],     // used by Struct, Union
+	fields:       vec::Vec<Field>,     // used by Struct, Union
 }
 
 pub struct Field {
-    name: *const str,
+    name: string::String,
     t: *mut Type,
 }

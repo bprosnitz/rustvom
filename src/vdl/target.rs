@@ -73,7 +73,7 @@ pub trait ListTarget {
 pub trait SetTarget {
 	// StartKey prepares conversion of the next set key.  FinishKey must be called
 	// to finish the key.
-	fn start_key(&self, ) -> Result<Target, io::Error>;
+	fn start_key(&self) -> Result<Target, io::Error>;
 	// FinishKey finishes a prior StartKey call.  ErrFieldNoExist indicates the
 	// key doesn't exist on the target.
 	fn finish_key(&self, key: Target) ->Option<io::Error>;
@@ -83,7 +83,7 @@ pub trait SetTarget {
 pub trait MapTarget {
 	// StartKey prepares conversion of the next map key.  FinishKeyStartField must
 	// be called to finish the key.
-	fn start_key(&self, ) -> Result<Target, io::Error>;
+	fn start_key(&self) -> Result<Target, io::Error>;
 	// FinishKeyStartField finishes a prior StartKey call, and starts the
 	// associated field.  ErrFieldNoExist indicates the key doesn't exist on the
 	// target.
