@@ -6,54 +6,55 @@ struct encoder {
     writer: io::Write,
 }
 
-impl encoder {
-    fn write_control_byte(&self, src: u8)
-}
-
 impl vdl::Target for encoder {
-    fn from_bool(&self, src: bool, tt: *mut vdl::Type) -> Option<vdl::TargetError> {
+    fn start(&self, tt: u64) -> Option<vdl::TargetError> {}
+    fn finish(&self) -> Option<vdl::TargetError> {}
+    fn start_any(&self, tt: u64) -> Option<vdl::TargetError> {}
+    fn finish_any(&self) -> Option<vdl::TargetError> {}
+
+    fn from_bool(&self, src: bool) -> Option<vdl::TargetError> {
         match low_level_write::write_bool(self.writer, src) {
             Ok(n) => None,
             Err(err) => Some(err),
         }
     }
 
-    fn from_uint(&self, src: u64, tt: *mut vdl::Type) -> Option<vdl::TargetError> {
+    fn from_uint(&self, src: u64) -> Option<vdl::TargetError> {
         match low_level_write::write_uint(self.writer, src) {
             Ok(n) => None,
             Err(err) => Some(err),
         }
     }
 
-    fn from_int(&self, src: i64, tt: *mut vdl::Type) -> Option<vdl::TargetError> {
+    fn from_int(&self, src: i64) -> Option<vdl::TargetError> {
         match low_level_write::write_int(self.writer, src) {
             Ok(n) => None,
             Err(err) => Some(err),
         }
     }
 
-    fn from_float(&self, src: f64, tt: *mut vdl::Type) -> Option<vdl::TargetError> {
+    fn from_float(&self, src: f64) -> Option<vdl::TargetError> {
         match low_level_write::write_float(self.writer, src) {
             Ok(n) => None,
             Err(err) => Some(err),
         }
     }
 
-    fn from_bytes(&self, src: &[u8], tt: *mut vdl::Type) -> Option<vdl::TargetError> {
+    fn from_bytes(&self, src: &[u8]) -> Option<vdl::TargetError> {
         match low_level_write::write_byte_slice(self.writer, src) {
             Ok(n) => None,
             Err(err) => Some(err),
         }
     }
 
-    fn from_string(&self, src: &str, tt: *mut vdl::Type) -> Option<vdl::TargetError> {
+    fn from_string(&self, src: &str) -> Option<vdl::TargetError> {
         match low_level_write::write_string(self.writer, src) {
             Ok(n) => None,
             Err(err) => Some(err),
         }
     }
 
-    fn from_enum_label(&self, src: &str, tt: *mut vdl::Type) -> Option<vdl::TargetError> {
+    fn from_enum_label(&self, src: &str) -> Option<vdl::TargetError> {
         let labels = unsafe{ (*tt).labels };
         for (no, label) in &labels.enumerate() {
             if label == src {
@@ -63,7 +64,7 @@ impl vdl::Target for encoder {
         vdl::TargetError::UnknownEnumLabelError(src)
     }
 
-    fn start_list(&self, tt: *mut vdl::Type, len: usize) -> Result<vdl::ListTarget, vdl::TargetError> {
+    fn start_list(&self, len: usize) -> Result<vdl::ListTarget, vdl::TargetError> {
         match low_level_write::write_uint(self.writer, len) {
             Ok(n) => Ok(&self),
             Err(err) => return Err(err),

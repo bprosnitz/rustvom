@@ -7,57 +7,62 @@ pub enum TargetError {
 }
 
 pub trait Target {
+    fn start(&self, tt: u64) -> Option<TargetError>;
+    fn finish(&self) -> Option<TargetError>;
+    fn start_any(&self, tt: u64) -> Option<TargetError>;
+    fn finish_any(&self) -> Option<TargetError>;
+
 	// FromBool converts from the src bool to the target, where tt represents the
 	// concrete type of bool.
-	fn from_bool(&self, src: bool, tt: *mut vdl::Type) -> Option<TargetError>;
+	fn from_bool(&self, src: bool) -> Option<TargetError>;
 	// FromUint converts from the src uint to the target, where tt represents the
 	// concrete type of uint.
-	fn from_uint(&self, src: u64, tt: *mut vdl::Type) -> Option<TargetError>;
+	fn from_uint(&self, src: u64) -> Option<TargetError>;
 	// FromInt converts from the src int to the target, where tt represents the
 	// concrete type of int.
-	fn from_int(&self, src: i64, tt: *mut vdl::Type) -> Option<TargetError>;
+	fn from_int(&self, src: i64) -> Option<TargetError>;
 	// FromFloat converts from the src float to the target, where tt represents
 	// the concrete type of float.
-	fn from_float(&self, src: f64, tt: *mut vdl::Type) -> Option<TargetError>;
+	fn from_float(&self, src: f64) -> Option<TargetError>;
 	// FromComplex converts from the src complex to the target, where tt
 	// represents the concrete type of complex.
-//	fn from_complex(&self, src: complex128, tt: *mut vdl::Type) -> Option<TargetError>;
+//	fn from_complex(&self, src: complex128) -> Option<TargetError>;
 	// FromBytes converts from the src bytes to the target, where tt represents
 	// the concrete type of bytes.
-	fn from_bytes(&self, src: &[u8], tt: *mut vdl::Type) -> Option<TargetError>;
+	fn from_bytes(&self, src: &[u8]) -> Option<TargetError>;
 	// FromString converts from the src string to the target, where tt represents
 	// the concrete type of string.
-	fn from_string(&self, src: &str, tt: *mut vdl::Type) -> Option<TargetError>;
+	fn from_string(&self, src: &str) -> Option<TargetError>;
 	// FromEnumLabel converts from the src enum label to the target, where tt
 	// represents the concrete type of enum.
-	fn from_enum_label(&self, src: &str, tt: *mut vdl::Type) -> Option<TargetError>;
+	fn from_enum_label(&self, src: &str) -> Option<TargetError>;
 	// FromTypeObject converts from the src type to the target.
 	fn from_type_object(&self, src: *mut vdl::Type) -> Option<TargetError>;
 	// FromNil converts from a nil (nonexistent) value of type tt, where tt must
 	// be of kind Optional or Any.
-	fn from_nil(&self, tt: *mut vdl::Type) -> Option<TargetError>;
+	fn from_nil(&self) -> Option<TargetError>;
 
 	// StartList prepares conversion from a list or array of type tt, with the
 	// given len.  FinishList must be called to finish the list.
-	fn start_list(&self, tt: *mut vdl::Type, len: usize) -> Result<ListTarget, TargetError>;
+	fn start_list(&self, len: usize) -> Result<ListTarget, TargetError>;
 	// FinishList finishes a prior StartList call.
 	fn finish_list(&self, x: ListTarget) -> Option<TargetError>;
 
 	// StartSet prepares conversion from a set of type tt, with the given len.
 	// FinishSet must be called to finish the set.
-	fn start_set(&self, tt: *mut vdl::Type, len: usize) -> Result<SetTarget, TargetError>;
+	fn start_set(&self, len: usize) -> Result<SetTarget, TargetError>;
 	// FinishSet finishes a prior StartSet call.
 	fn finish_set(&self, x: SetTarget) -> Option<TargetError>;
 
 	// StartMap prepares conversion from a map of type tt, with the given len.
 	// FinishMap must be called to finish the map.
-	fn start_map(&self, tt: *mut vdl::Type, len: usize) -> Result<MapTarget, TargetError>;
+	fn start_map(&self, len: usize) -> Result<MapTarget, TargetError>;
 	// FinishMap finishes a prior StartMap call.
 	fn finish_map(&self, x: MapTarget) -> Option<TargetError>;
 
 	// StartFields prepares conversion from a struct or union of type tt.
 	// FinishFields must be called to finish the fields.
-	fn start_fields(&self, tt: *mut vdl::Type) -> Result<FieldsTarget, TargetError>;
+	fn start_fields(&self) -> Result<FieldsTarget, TargetError>;
 	// FinishFields finishes a prior StartFields call.
 	fn finish_fields(&self, x: FieldsTarget) -> Option<TargetError>;
 }
